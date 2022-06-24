@@ -1,0 +1,79 @@
+---
+title: "Assignment 03"
+author: "Karlie Schwartzwald"
+date: '2022-06-23'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = 'C:/Users/karli/OneDrive/Documents/Data Science/DSC520_Stats_for_DS/DSC520/dsc520')
+```
+## Load the ggplot2 package
+```{r load}
+library(ggplot2)
+theme_set(theme_minimal())
+```
+## Set the working directory to the root of your DSC 520 directory
+**Note: This was done during the 'setup' chunk since this is an Rmarkdown file.**
+```{r}
+getwd()
+```
+## Load the `data/r4ds/heights.csv` to
+```{r}
+heights_df <- read.csv("data/r4ds/heights.csv")
+```
+# https://ggplot2.tidyverse.org/reference/geom_point.html
+## Using `geom_point()` create three scatterplots for
+## `height` vs. `earn`
+```{r}
+ggplot(heights_df, aes(x=height, y=earn)) + geom_point()
+```
+## `age` vs. `earn`
+```{r}
+ggplot(heights_df, aes(x=age, y=earn)) + geom_point()
+```
+## `ed` vs. `earn`
+```{r}
+ggplot(heights_df, aes(x=ed, y=earn)) + geom_point()
+```
+## Re-create the three scatterplots and add a regression trend line using
+## the `geom_smooth()` function
+## `height` vs. `earn`
+```{r}
+ggplot(heights_df, aes(x=height, y=earn)) + geom_point() + geom_smooth()
+```
+## `age` vs. `earn`
+```{r}
+ggplot(heights_df, aes(x=age, y=earn)) + geom_point() + geom_smooth()
+```
+## `ed` vs. `earn`
+```{r}
+ggplot(heights_df, aes(x=ed, y=earn)) + geom_point() + geom_smooth()
+```
+## Create a scatterplot of `height`` vs. `earn`.  Use `sex` as the `col` (color) attribute
+```{r}
+ggplot(heights_df, aes(x=height, y=earn, col=sex)) + geom_point()
+```
+## Using `ggtitle()`, `xlab()`, and `ylab()` to add a title, x label, and y label to the previous plot
+## Title: Height vs. Earnings
+## X label: Height (Inches)
+## Y Label: Earnings (Dollars)
+```{r}
+ggplot(heights_df, aes(x=height, y=earn, col=sex)) + ggtitle("Height vs. Earnings") + xlab("Height (Inches)") + ylab("Earnings (Dollars)") + geom_point()
+```
+# https://ggplot2.tidyverse.org/reference/geom_histogram.html
+## Create a histogram of the `earn` variable using `geom_histogram()`
+```{r}
+ggplot(heights_df, aes(earn)) + geom_histogram()
+```
+## Create a histogram of the `earn` variable using `geom_histogram()`
+## Use 10 bins
+```{r}
+ggplot(heights_df, aes(earn)) + geom_histogram(bins = 10)
+```
+# https://ggplot2.tidyverse.org/reference/geom_density.html
+## Create a kernel density plot of `earn` using `geom_density()`
+```{r}
+ggplot(heights_df, aes(earn)) +  geom_density()
+```
