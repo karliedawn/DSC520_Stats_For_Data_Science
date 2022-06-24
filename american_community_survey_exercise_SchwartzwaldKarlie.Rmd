@@ -1,0 +1,106 @@
+---
+title: "American Community Survey Exercise"
+author: "Karlie Schwartzwald"
+date: '2022-06-24'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = 'C:/Users/karli/OneDrive/Documents/Data Science/DSC520_Stats_for_DS/DSC520/dsc520/')
+```
+
+```{r load, include=FALSE}
+# Load ggplot Library 
+library(ggplot2)
+theme_set(theme_minimal())
+# Load the CSV file
+survey_df <- read.csv("data/acs-14-1yr-s0201.csv")
+```
+
+### 1. What are the elements in your data (including the categories and data types)?
+
+The categories of our data are ID (string), ID2 (integer), Geography (string), PopGroupID (integer), POPGROUP.display.label (string), RacesReported (integer), HSdegree (float), and Bachdegree (float).
+
+### 2. Please provide the output from the following functions: str(); nrow(); ncol()
+
+```{r}
+str(survey_df)
+nrow(survey_df)
+ncol(survey_df)
+```
+
+### 3. Create a Histogram of the HSDegree variable using the ggplot2 package.
+
+#### - Set a bin size for the Histogram.
+
+#### - Include a Title and appropriate X/Y axis labels on your Histogram Plot.
+
+  Knitting below:
+
+```{r}
+
+ggplot(survey_df, aes(HSDegree)) + ggtitle("Histogram of the Percentage of Population with High School Degree") + xlab("Percentage with HS Degree") + ylab("Frequency") + geom_histogram(aes(y = ..density..), binwidth = 0.5)
+```
+
+### 4. Answer the following questions based on the Histogram produced:
+
+#### - Based on what you see in this histogram, is the data distribution unimodal?
+
+Yes, the distribution is unimodal.
+
+#### - Is it approximately symmetrical?
+
+No, it is not symmetrical.
+
+#### - Is it approximately bell-shaped?
+
+Yes, it is approximately bell-shaped.
+
+#### - Is it approximately normal?
+
+No, it is not normal.
+
+#### - If not normal, is the distribution skewed? If so, in which direction?
+
+It is skewed in the negative direction.
+
+#### - Include a normal curve to the Histogram that you plotted.
+
+#### - Explain whether a normal distribution can accurately be used as a model for this data.
+
+No we would need to use a skewed distribution.
+
+```{r}
+ggplot(survey_df, aes(HSDegree)) + ggtitle("Histogram of the Percentage of Population with High School Degree") + xlab("Percentage with HS Degree") + ylab("Frequency") + geom_histogram(aes(y = ..density..), binwidth = 0.5) + stat_function(fun = dnorm, colour = "red", args = list(mean=mean(survey_df$HSDegree, na.rm = TRUE), sd=sd(survey_df$HSDegree, na.rm = TRUE)), size = 1)
+```
+
+### 5. Create a Probability Plot of the HSDegree variable.
+
+```{r}
+qplot(sample = survey_df$HSDegree, stat="qq")
+```
+
+### 6. Answer the following questions based on the Probability Plot:
+
+#### Based on what you see in this probability plot, is the distribution approximately normal? Explain how you know.
+
+No, if it were normal there would be straight diagonal line instead of a curved one.
+
+#### If not normal, is the distribution skewed? If so, in which direction? Explain how you know.
+
+The distribution is negatively skewed. You can see that the line is concave down.
+
+### 7. Now that you have looked at this data visually for normality, you will now quantify normality with numbers using the stat.desc() function. Include a screen capture of the results produced.
+
+```{r}
+library(pastecs)
+stat.desc(survey_df$HSDegree, norm = TRUE)
+```
+### 8. In several sentences provide an explanation of the result produced for skew, kurtosis, and z-scores. In addition, explain how a change in the sample size may change your explanation?
+
+With a skew value less than negative 1, we can consider this distribution significantly skewed in the negative direction and thus not normal.
+a Kurtosis value above 1 is considered too pointy to be normal.
+Thus our distributions is nonnormal.
+Skew and Kurtosis can be used to calculate z-scores.
+A larger sample size would result in a smaller standard error, and thus we would need a higher threshold of z-score.
