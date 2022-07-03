@@ -1,0 +1,111 @@
+---
+title: "Assignment Week 4"
+author: "Karlie Schwartzwald"
+date: '2022-07-03'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+First I will import the data from scores.csv
+
+```{r scores import}
+scores <- read.csv("scores.csv")
+```
+What are the observational units in this study?
+```{r}
+print("The observation units in this study are course grades for these two sections of students")
+```
+Identify the variables mentioned in the narrative paragraph and determine which are categorical and quantitative?
+```{r}
+print("The variables are Section (Categorical), Score (Quantitative) and Count (Quantitative)")
+str(scores)
+```
+Create one variable to hold a subset of your data set that contains only the Regular Section and one variable for the Sports Section.
+```{r}
+regular_section <-subset(scores, scores$Section=="Regular")
+sports_section <-subset(scores, scores$Section=="Sports")
+print(regular_section)
+print(sports_section)
+```
+Use the Plot function to plot each Sections scores and the number of students achieving that score. Use additional Plot Arguments to label the graph and give each axis an appropriate label. Once you have produced your Plots answer the following questions:
+```{r}
+# plots
+plot(regular_section$Score, regular_section$Count, main="Regular Section Grade Scores", ylab = "Frequency", xlab = "Score")
+plot(sports_section$Score, sports_section$Count, main="Sports Section Grade Scores", ylab = "Frequency", xlab = "Score")
+```
+
+1. Comparing and contrasting the point distributions between the two section, looking at both tendency and consistency: Can you say that one section tended to score more points than the other? Justify and explain your answer.
+```{r}
+regular_mean = sum(regular_section$Score*regular_section$Count)/sum(regular_section$Count)
+sports_mean = sum(sports_section$Score*sports_section$Count)/sum(sports_section$Count)
+sprintf("The regular section has a mean score of %f.", regular_mean) 
+sprintf("The sports section has a mean score of %f.",sports_mean)
+print("Although the sports section had a higher top grade in the class, it tended to score lower than the other section.")
+```
+2. Did every student in one section score more points than every student in the other section? If not, explain what a statistical tendency means in this context.
+```{r}
+print("Every student in one section did not score better than every student in another section. What we mean by statistical tendency in this context, is that the mean score between the two sections was different and the regular section scored higher on average. Statistical tendency could also refer to measures of median and mode.")
+```
+3. What could be one additional variable that was not mentioned in the narrative that could be influencing the point distributions between the two sections?
+```{r}
+print("An additional variable not mentioned in the narrative that could be influencing the point distributions between the two sections is what time of day the class is. If one class is very early in the morning, or right after lunch, it could be that sleepy students do worse in these classes.")
+```
+Now we open the 2014 American Community Survey data
+```{r  housing_import}
+library(readxl)
+week_6_housing <- read_excel("week-6-housing.xlsx")
+head(week_6_housing)
+```
+1. Use the apply function on a variable in your dataset.
+```{r}
+# using the apply function with mean on the sale price variable
+sale_price = matrix(week_6_housing$`Sale Price`)
+apply(sale_price, 2, mean)
+```
+2. Use the aggregate function on a variable in your dataset
+```{r}
+# cut the sq feet by number of bedrooms, with mean
+aggregate(square_feet_total_living ~ bedrooms, week_6_housing, mean)
+```
+3. Use the plyr function on a variable in your dataset – more specifically, I want to see you split some data, perform a modification to the data, and then bring it back together
+```{r}
+library(plyr)
+price_per_bedroom = ddply(
+ .data = week_6_housing,
+ .variables = "bedrooms",
+ .fun = function(x) mean(x$'Sale Price')
+)
+price_per_bedroom
+```
+4. Check distributions of the data
+```{r}
+# Below is a selection of distributions from some variables in the data
+d1 <- density(week_6_housing$`Sale Price`)
+plot(d1, main="Housing Sale Price Density", xlab="Date", ylab="Frequency")
+
+d2<- density(week_6_housing$square_feet_total_living)
+plot(d2, main="Housing Sales Total Square Feet Density", xlab="Square Feet", ylab="Frequency")
+
+hist(week_6_housing$`Sale Date`, main="Sale Date", xlab = "Years", breaks ="years")
+
+hist(week_6_housing$bedrooms, main="Number of Bedrooms Histogram", xlab="Number of Rooms", ylab="Frequency")
+
+hist(week_6_housing$year_built, main="Year House was Built Histogram", xlab="Year", ylab="Frequency")
+```
+5. Identify if there are any outliers
+```{r}
+print("There are outliers in the year the ouses were built which were built before 1920. There are outliers in the Total Square Feet of the houses sold with some houses with over 12000 sq feet. There are also numerous outliers in the Sale Date category.")
+```
+6. Create at least 2 new variables
+```{r}
+# create price_per_foot variable
+week_6_housing$price_per_foot = week_6_housing$`Sale Price`/week_6_housing$square_feet_total_living
+# create  variable
+week_6_housing$total_bathrooms = week_6_housing$bath_full_count + 0.5*(week_6_housing$bath_half_count) + 0.75*(week_6_housing$bath_3qtr_count)
+# make histograms of the new variables
+hist(week_6_housing$price_per_foot)
+hist(week_6_housing$total_bathrooms)
+```
