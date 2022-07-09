@@ -1,0 +1,114 @@
+---
+title: "Assignment Week 5"
+author: "Karlie Schwartzwald"
+date: '2022-07-08'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(magrittr)
+```
+
+First, I open the 2014 American Community Survey data:
+
+## 1. Dplyr package
+
+```{r  housing_import}
+library(readxl)
+setwd('C:/Users/karli/OneDrive/Documents/Data_Science/DSC520_Stats_for_DS')
+week_6_housing <- read_excel("week-6-housing.xlsx")
+colnames(week_6_housing)[2] <- "Sale_Price"
+housing_complete <- na.omit(week_6_housing)
+head(housing_complete)
+```
+#### Using the GroupBy function:
+
+```{r  GroupBy}
+housing_complete %>%
+  group_by(bedrooms) %>%
+  summarize(mean(square_feet_total_living))
+```
+#### Using the Summarize function:
+
+```{r  Summarize}
+housing_complete %>%
+ group_by(building_grade) %>%
+ summarize(mean(Sale_Price))
+```
+#### Using the Mutate function:
+
+```{r  Mutate}
+housing_complete %>% 
+  select(Sale_Price, sq_ft_lot) %>%
+  mutate(Sale_Price/sq_ft_lot)
+```
+#### Using the Filter function:
+
+```{r  Filter}
+housing_complete %>% filter_("year_renovated != 0")
+```
+#### Using the Select function:
+
+```{r  Select}
+housing_complete %>%
+  select_('Sale_Price')
+```
+#### Using the Arrange function:
+
+```{r  Arrange}
+housing_complete %>%
+  group_by(bedrooms) %>%
+  summarize(avgprice=mean(Sale_Price)) %>%
+  arrange(avgprice)
+```
+
+## 2. Purrr Package
+
+#### Using the keep function:
+```{r  keep}
+# You could use zip_n, keep, discard, compact, etc.
+library(purrr)
+expensive_sales <- housing_complete$Sale_Price %>%
+  keep(~{mean(.x)>600000})
+head(expensive_sales)
+```
+
+#### Using the  function:
+```{r }
+# You could use zip_n, keep, discard, compact, etc.
+complete_sale_price <- housing_complete$Sale_Price %>%
+  compact()
+head(complete_sale_price)
+```
+
+## 3. cbind and rbind
+
+#### cbind
+```{r cbind}
+bathrooms <- cbind('Full Bath'=week_6_housing$bath_full_count, '3/4 Bath'=week_6_housing$bath_3qtr_count, '1/2 Bath'=week_6_housing$bath_half_count)
+head(bathrooms)
+```
+
+#### rbind
+```{r rbind}
+cheap_sales <- week_6_housing %>%
+  filter(Sale_Price<600000) %>%
+  cbind()
+head(cheap_sales)
+```
+
+## 4. Split a string, then concatenate the results back together
+```{r concatenate}
+library(stringr)
+
+# create string
+string1 <- "I need to split a string~ I will split based on the tilde~ Hopefully there will be enough tilde to split on~ Testing now."
+print(string1)
+
+# Split String
+split_string1 <- str_split(string=string1,pattern='~')
+print(split_string1)
+paste(unlist(split_string1), sep = " ", collapse = "~")
+```
