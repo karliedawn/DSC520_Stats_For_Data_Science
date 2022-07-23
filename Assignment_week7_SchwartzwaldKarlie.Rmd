@@ -1,0 +1,120 @@
+---
+title: "Assignment Week 7"
+author: "Karlie Schwartzwald"
+date: '2022-07-22'
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = 'C:/Users/karli/OneDrive/Documents/Data_Science/DSC520_Stats_for_DS/DSC520/dsc520')
+```
+# Assignment 05
+## Set the working directory to the root of your DSC 520 directory
+```{r}
+getwd()
+```
+
+## Load the `data/r4ds/heights.csv` to
+```{r}
+heights_df <- read.csv("data/r4ds/heights.csv")
+head(heights_df)
+```
+
+## Using `cor()` compute correlation coefficients for height vs. earn
+```{r}
+cor(heights_df[, c("height", "earn")])
+```
+
+### age vs. earn
+```{r}
+cor(heights_df[, c("age", "earn")])
+```
+
+### ed vs. earn
+```{r}
+cor(heights_df[, c("ed", "earn")])
+```
+
+## Spurious correlation
+The following is data on US spending on science, space, and technology in millions of today's dollars and Suicides by hanging strangulation and suffocation for the years 1999 to 2009. Compute the correlation between these variables:
+```{r}
+tech_spending <- c(18079, 18594, 19753, 20734, 20831, 23029, 23597, 23584, 25525, 27731, 29449)
+suicides <- c(5427, 5688, 6198, 6462, 6635, 7336, 7248, 7491, 8161, 8578, 9000)
+print('The correlation between tech spending and suicides is:')
+print(cor(tech_spending,suicides))
+```
+
+# Student Survey
+
+#### As a data science intern with newly learned knowledge in skills in statistical correlation and R programming, you will analyze the results of a survey recently given to college students. You learn that the research question being investigated is: “Is there a significant relationship between the amount of time spent reading and the time spent watching television?” You are also interested if there are other significant relationships that can be discovered? The survey data is located in this StudentSurvey.csv file.  
+```{r}
+survey_df <- read.csv("student-survey.csv")
+head(survey_df)
+```
+
+#### Use R to calculate the covariance of the Survey variables and provide an explanation of why you would use this calculation and what the results indicate.
+```{r}
+cov(survey_df)
+```
+The covariance indicates the relationship of two variables whenever one of those variables changes. In these results we can see that TimeReading has a negative covariance with TimeTV, Happiness, and Gender. This means that as TimeReading goes up, those variables move down. However, TimeTV has a positive covariance with Happiness, and thus, when  TimeTV goes up so does happiness.  
+
+#### Examine the Survey data variables. What measurement is being used for the variables? Explain what effect changing the measurement being used for the variables would have on the covariance calculation. Would this be a problem? Explain and provide a better alternative if needed.  
+
+TimeReading appears to be measured in hours while TimeTV appears to be measured in minutes. Happiness is on a scale of 1-100 and Gender takes on a binary value. Changing the measurement being used for the variables will change the magnitude of the covariance value. This is a problem, because without a normalized measure of covariance, we can't really compare covariances between variables because magnitudes are meaningless. An improvement would be to use correlation which is normalized.
+
+#### Choose the type of correlation test to perform, explain why you chose this test, and make a prediction if the test yields a positive or negative correlation? Perform a correlation analysis of:  
+
+#### All variables  
+
+I will use a point-biserial correlation coefficient test correlation between Gender and all other variables because Gender has binary values to compare against continuous interval variables. I believe that the positive and negative signs on each correlation will match that of the covariance between each variable indicated above from the previous problem. For the rest of the analysis, I will be using the Pearson Correlation Coefficient because the rest of the variables are interval.
+```{r}
+# Pearson's product-moment correlations
+print(cor.test(survey_df$Happiness, survey_df$Gender))
+print(cor.test(survey_df$TimeReading, survey_df$Gender))
+print(cor.test(survey_df$TimeTV, survey_df$Gender))
+
+# Pearson Correlation Coefficient
+cor(survey_df)
+```
+
+#### A single correlation between two a pair of the variables  
+```{r}
+cor.test(survey_df$TimeReading, survey_df$TimeTV, method =
+"pearson", conf.level = 0.95)
+```
+
+#### Repeat your correlation test in step 2 but set the confidence interval at 99%  
+```{r}
+cor.test(survey_df$TimeReading, survey_df$TimeTV, method =
+"pearson", conf.level = 0.99)
+```
+
+#### Describe what the calculations in the correlation matrix suggest about the relationship between the variables. Be specific with your explanation.  
+
+```{r}
+cor(survey_df)
+```
+
+The correlation matrix tells us that the more time a person spends reading, the less time they will be watching TV. It will also reduce their happiness, but not affecting happiness nearly as much as it affects TV time.It also tells us that the more time a person spends watching TV, the less time they spend reading and the happier they are. Although, the affect on happiness is less significant than the effect on reading time. Gender is not closely correlated with any of the other variables, so we can conclude that Gender does not coincide much with more reading time or tv time.
+
+#### Calculate the correlation coefficient and the coefficient of determination, describe what you conclude about the results.  
+
+```{r}
+cor(survey_df)^2
+```
+
+We can say that TimeReading shares 78.0% of the variability in TimeTV, 18.9% of the variability in Happiness. Gender shares 0.01% of the variability in TimeReading and none of the variability in TimeTV, and only 2.5% of the variability in happiness. TimeTV accounts for 40.5% of the variability in Happiness.
+
+#### Based on your analysis can you say that watching more TV caused students to read less? Explain.   
+
+No, we cannot conclude that watching more TV caused students to read less. This is because all that we have measured is correlation, not causation. In other words, we don't know whether watching more TV caused students to read less, or whether reading less caused students to watch less TV. Furthermore, there could be a third variable that is the cause of both TimeTV and TimeReading.
+
+#### Pick three variables and perform a partial correlation, documenting which variable you are “controlling”. Explain how this changes your interpretation and explanation of the results.  
+```{r}
+library(ggm)
+pcor<-pcor(c("TimeTV", "Happiness", "TimeReading"), var(survey_df))
+print(pcor)
+```
+
+In the code above we compared the partial correlation between TimeTV and Happiness, controlling for TimeReading. I appears that about half of the correlation between TimeTV and Happiness can be explained by variation in TimeReading.Therefore, the true correlation between TimeTV and Happiness is diminished.
